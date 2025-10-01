@@ -11,6 +11,7 @@ use App\Domains\Product\Interface\ProductInterface;
 use App\GraphQL\Resolvers\GalleryResolver;
 use App\GraphQL\Types\GalleryType;
 use App\Core\Container\Container;
+use App\GraphQL\Resolvers\CategoryResolver;
 
 class ProductType extends ObjectType
 {
@@ -41,8 +42,7 @@ class ProductType extends ObjectType
                 ],
                 "category" => [
                     "type" => $container->get(CategoryType::class),
-                    "description" => "To be implemented!!! by dataloaders",
-                    "resolve" => fn() => []
+                    "resolve" => [$container->get(CategoryResolver::class), "loadProductCategory"],
                 ],
                 "brand" => [
                     "type" => Type::string(),
