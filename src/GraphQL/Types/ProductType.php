@@ -8,6 +8,8 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 
 use App\Domains\Product\Interface\ProductInterface;
+use App\GraphQL\Resolvers\GalleryResolver;
+use App\GraphQL\Types\GalleryType;
 use App\Core\Container\Container;
 
 class ProductType extends ObjectType
@@ -32,6 +34,10 @@ class ProductType extends ObjectType
                 "description" => [
                     "type" => Type::nonNull(Type::string()),
                     "resolve" => fn(ProductInterface $product) => $product->getDescription(),
+                ],
+                "gallery" => [
+                    "type" => Type::listOf($container->get(GalleryType::class)),
+                    "resolve" => [$container->get(GalleryResolver::class), "getGalleryByProductIds"]
                 ],
                 "category" => [
                     "type" => $container->get(CategoryType::class),
