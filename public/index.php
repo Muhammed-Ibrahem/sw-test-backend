@@ -2,26 +2,31 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) {
-    $r->post('/graphql', [App\Controller\GraphQL::class, 'handle']);
-});
+use Dotenv\Dotenv;
 
-$routeInfo = $dispatcher->dispatch(
-    $_SERVER['REQUEST_METHOD'],
-    $_SERVER['REQUEST_URI']
-);
+use App\App;
+use App\Config\Config;
+use App\Core\Container\Container;
+use App\Core\Logger\Logger;
 
-switch ($routeInfo[0]) {
-    case FastRoute\Dispatcher::NOT_FOUND:
-        // ... 404 Not Found
-        break;
-    case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-        $allowedMethods = $routeInfo[1];
-        // ... 405 Method Not Allowed
-        break;
-    case FastRoute\Dispatcher::FOUND:
-        $handler = $routeInfo[1];
-        $vars = $routeInfo[2];
-        echo $handler($vars);
-        break;
-}
+$dotenv = Dotenv::createImmutable(dirname(__DIR__));
+$dotenv->load();
+
+
+
+$request = [
+    'method' => $_SERVER['REQUEST_METHOD'],
+    'uri' => $_SERVER['REQUEST_URI']
+];
+
+Logger::log("{$request['method']} {$request['uri']}");
+
+$container = new Container();
+
+$config = new Config($_ENV);
+
+(new App(
+    $container,
+    $request,
+    $config
+))->bootstrapApplication();
