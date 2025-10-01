@@ -33,7 +33,7 @@ final class Container implements ContainerInterface
         return isset($this->entries[$id]);
     }
 
-    public function set(string $id, callable|string $concrete): void
+    public function set(string $id, mixed $concrete): void
     {
         $this->entries[$id] = $concrete;
     }
