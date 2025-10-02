@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Types;
 
-use App\Core\Container\Container;
-use App\Domains\Category\Interface\CategoryInterface;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
+
+use App\Domains\Category\Interface\CategoryInterface;
+use App\GraphQL\Resolvers\ProductResolver;
+use App\GraphQL\Types\ProductType;
+use App\Core\Container\Container;
 
 class CategoryType extends ObjectType
 {
@@ -25,9 +28,8 @@ class CategoryType extends ObjectType
                     "resolve" => fn(CategoryInterface $category): string => $category->getName(),
                 ],
                 "products" => [
-                    "type" => Type::listOf(Type::string()),
-                    "description" => "To be implemented!!!",
-                    "resolve" => fn(): array => []
+                    "type" => Type::listOf($container->get(ProductType::class)),
+                    "resolve" => [$container->get(ProductResolver::class), "loadProductsForEachCategory"]
                 ]
             ]
         ]);

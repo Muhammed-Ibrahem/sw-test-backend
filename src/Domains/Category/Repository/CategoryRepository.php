@@ -19,4 +19,19 @@ final class CategoryRepository extends BaseRepository
 
         return $stmt->fetchAll();
     }
+
+    public function findByIds(array $categoryIds): array
+    {
+        if (empty($categoryIds)) return [];
+
+        $placeholder = join(",", \array_pad([], \count($categoryIds), "?"));
+
+        $query = "SELECT * FROM category WHERE id IN ({$placeholder})";
+
+        $stmt = $this->connection->prepare($query);
+
+        $stmt->execute($categoryIds);
+
+        return $stmt->fetchAll();
+    }
 }

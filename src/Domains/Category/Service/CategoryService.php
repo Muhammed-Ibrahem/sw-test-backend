@@ -27,7 +27,18 @@ final class CategoryService
         }
     }
 
+    public function getCategoriesByIds(array $categoryIds): array
+    {
+        try {
+            $rows = $this->repo->findByIds($categoryIds);
 
+            $categories = $this->createCategoriesGroupedById($rows);
+
+            return $categories;
+        } catch (Exception $e) {
+            throw new Exception("Failed to retrieve categories: {$e->getMessage()}");
+        }
+    }
     private function createCategoryFromDBRow(array $row): CategoryInterface
     {
         $categoryName = $row['name'];
@@ -44,5 +55,16 @@ final class CategoryService
         }
 
         return $categories;
+    }
+
+    private function createCategoriesGroupedById(array $rows): array
+    {
+        $groupedCategories = [];
+
+        foreach ($rows as $row) {
+            $groupedCategories[$row['id']] = $this->createCategoryFromDBRow($row);
+        }
+
+        return $groupedCategories;
     }
 }
