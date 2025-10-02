@@ -10,11 +10,13 @@ use GraphQL\Type\Definition\Type;
 use App\Domains\Product\Interface\ProductInterface;
 use App\Core\Container\Container;
 
+use App\GraphQL\Types\AttributeSetType;
 use App\GraphQL\Types\CategoryType;
 use App\GraphQL\Types\GalleryType;
 use App\GraphQL\Types\BrandType;
 use App\GraphQL\Types\PriceType;
 
+use App\GraphQL\Resolvers\AttributeSetResolver;
 use App\GraphQL\Resolvers\CategoryResolver;
 use App\GraphQL\Resolvers\GalleryResolver;
 use App\GraphQL\Resolvers\BrandResolver;
@@ -56,8 +58,8 @@ class ProductType extends ObjectType
                     "resolve" => [$container->get(BrandResolver::class), "loadProductBrand"]
                 ],
                 "attributes" => [
-                    "type" => Type::string(),
-                    "resolve" => fn() => "To be implemented!!! by dataloaders"
+                    "type" => Type::listOf($container->get(AttributeSetType::class)),
+                    "resolve" => [$container->get(AttributeSetResolver::class), "loadProductAttributeSets"]
                 ],
                 "prices" => [
                     "type" => Type::listOf($container->get(PriceType::class)),
