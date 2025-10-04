@@ -4,29 +4,29 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Resolvers;
 
-use App\Core\Container\Container;
-use App\Domains\Gallery\Service\GalleryService;
-use App\Domains\Product\Interface\ProductInterface;
-use App\GraphQL\DataLoader\GalleryLoader;
 use GraphQL\Deferred;
+
+use App\Domains\Product\Interface\ProductInterface;
+use App\Domains\Gallery\Service\GalleryService;
+use App\GraphQL\DataLoader\GalleryLoader;
 
 class GalleryResolver
 {
     public function __construct(
         private GalleryService $galleryService,
-        private Container $container
+        private GalleryLoader $galleryLoader
     ) {}
 
     public function getGalleryByProductIds(ProductInterface $product): Deferred
     {
-        $galleryLoader = $this->container->get(GalleryLoader::class);
+        $productId = $product->getId();
 
-        $galleryLoader->load($product->getId());
+        $this->galleryLoader->load($productId);
 
-        return new Deferred(function () use ($galleryLoader, $product) {
-            $galleryLoader->loadBuffered();
+        return new Deferred(function () use ($productId) {
+            $this->galleryLoader->loadBuffered();
 
-            return $galleryLoader->getValue($product->getId());
+            return $this->galleryLoader->getValue($productId);
         });
     }
 }

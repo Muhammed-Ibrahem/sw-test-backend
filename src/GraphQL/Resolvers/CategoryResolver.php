@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Resolvers;
 
-use App\Core\Container\Container;
-use App\Domains\Category\Service\CategoryService;
-use App\Domains\Product\Interface\ProductInterface;
-use App\GraphQL\DataLoader\CategoryLoader;
 use GraphQL\Deferred;
+
+use App\Domains\Product\Interface\ProductInterface;
+use App\Domains\Category\Service\CategoryService;
+use App\GraphQL\DataLoader\CategoryLoader;
 
 class CategoryResolver
 {
     public function __construct(
         private CategoryService $categoryService,
-        private Container $container
+        private CategoryLoader $categoryLoader
     ) {}
 
     public function getCategories(): array
@@ -24,14 +24,14 @@ class CategoryResolver
 
     public function loadProductCategory(ProductInterface $product): Deferred
     {
-        $categoryLoader = $this->container->get(CategoryLoader::class);
+        $categoryId = $product->getCategoryId();
 
-        $categoryLoader->load($product->getCategoryId());
+        $this->categoryLoader->load($categoryId);
 
-        return new Deferred(function () use ($categoryLoader, $product) {
-            $categoryLoader->loadBuffered();
+        return new Deferred(function () use ($categoryId) {
+            $this->categoryLoader->loadBuffered();
 
-            return $categoryLoader->getValue($product->getCategoryId());
+            return $this->categoryLoader->getValue($categoryId);
         });
     }
 }
