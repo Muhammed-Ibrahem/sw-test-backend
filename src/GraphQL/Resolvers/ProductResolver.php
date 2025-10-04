@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Resolvers;
 
+use GraphQL\Deferred;
+
 use App\Domains\Category\Interface\CategoryInterface;
 use App\Domains\Product\Interface\ProductInterface;
 use App\Domains\Product\Service\ProductService;
 use App\GraphQL\DataLoader\ProductLoader;
-use App\Core\Container\Container;
-use GraphQL\Deferred;
 
 class ProductResolver
 {
-    public function __construct(private ProductService $srv, private Container $container) {}
+    public function __construct(
+        private ProductService $srv,
+        private ProductLoader $productLoader,
+    ) {}
 
     public function getProductById(string $id): ?ProductInterface
     {
@@ -27,13 +30,14 @@ class ProductResolver
 
     public function loadProductsForEachCategory(CategoryInterface $category): Deferred
     {
-        $productsLoader = $this->container->get(ProductLoader::class);
-        $productsLoader->load($category->getId());
+        $categoryId = $category->getId();
 
-        return new Deferred(function () use ($productsLoader, $category) {
-            $productsLoader->loadBuffered();
+        $this->productLoader->load($categoryId);
 
-            return $productsLoader->getValue($category->getId());
+        return new Deferred(function () use ($categoryId) {
+            $this->productLoader->loadBuffered();
+
+            return $this->productLoader->getValue($categoryId);
         });
     }
 }

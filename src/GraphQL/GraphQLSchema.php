@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\GraphQL;
 
-use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
+use GraphQL\Type\Schema;
 
-use App\Core\Container\Container;
 use App\GraphQL\Factory\MutationTypeFactory;
 use App\GraphQL\Factory\QueryTypeFactory;
+use App\Core\Container\Container;
 
 final class GraphQLSchema
 {
