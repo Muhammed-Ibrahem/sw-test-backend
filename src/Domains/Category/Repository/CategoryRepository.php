@@ -34,4 +34,15 @@ final class CategoryRepository extends BaseRepository
 
         return $stmt->fetchAll();
     }
+
+    public function findByName(string $categoryName)
+    {
+        $query = "SELECT * FROM category WHERE name = :categoryName";
+
+        $stmt = $this->connection->prepare($query);
+
+        $stmt->execute(["categoryName" => $categoryName]);
+
+        return $stmt->fetch();
+    }
 }

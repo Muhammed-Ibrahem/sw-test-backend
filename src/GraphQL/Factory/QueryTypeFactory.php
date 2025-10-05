@@ -25,6 +25,13 @@ final class QueryTypeFactory
                     "type" => Type::listOf($container->get(CategoryType::class)),
                     "resolve" => [$container->get(CategoryResolver::class), "getCategories"],
                 ],
+                "category" => [
+                    "type" => $container->get(CategoryType::class),
+                    "args" => [
+                        "name" => Type::nonNull(Type::string())
+                    ],
+                    "resolve" => [$container->get(CategoryResolver::class), "getCategory"]
+                ],
                 "product" => [
                     "type" => $container->get(ProductType::class),
                     "args" => [

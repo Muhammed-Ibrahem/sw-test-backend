@@ -22,6 +22,13 @@ class CategoryResolver
         return $this->categoryService->getAllCategories();
     }
 
+    public function getCategory($root, $args)
+    {
+        $categoryName = $args['name'];
+
+        return $this->categoryService->getCategoryByName($categoryName);
+    }
+
     public function loadProductCategory(ProductInterface $product): Deferred
     {
         $categoryId = $product->getCategoryId();

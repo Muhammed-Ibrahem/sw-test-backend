@@ -39,6 +39,19 @@ final class CategoryService
             throw new Exception("Failed to retrieve categories: {$e->getMessage()}");
         }
     }
+
+    public function getCategoryByName(string $categoryName)
+    {
+        try {
+            $row = $this->repo->findByName($categoryName);
+
+            $category = $this->createCategoryFromDBRow($row);
+
+            return $category;
+        } catch (Exception $e) {
+            throw new Exception("Failed to retrieve categories: {$e->getMessage()}");
+        }
+    }
     private function createCategoryFromDBRow(array $row): CategoryInterface
     {
         $categoryName = $row['name'];
