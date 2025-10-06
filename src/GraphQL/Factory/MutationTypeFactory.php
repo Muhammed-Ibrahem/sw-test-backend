@@ -7,6 +7,8 @@ namespace App\GraphQL\Factory;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 
+use App\GraphQL\InputTypes\OrderItemInputType;
+use App\GraphQL\Resolvers\OrderResolver;
 use App\Core\Container\Container;
 
 final class MutationTypeFactory
@@ -24,6 +26,17 @@ final class MutationTypeFactory
                     ],
                     "resolve" => fn($calc, array $args) => $args["x"] + $args["y"]
                 ],
+                "placeOrder" => [
+                    "type" => Type::nonNull(Type::int()),
+                    "args" => [
+                        "orderItems" => Type::nonNull(
+                            Type::listOf(
+                                Type::nonNull($container->get(OrderItemInputType::class))
+                            )
+                        )
+                    ],
+                    "resolve" => [$container->get(OrderResolver::class), 'placeOrder']
+                ]
             ]
         ]);
     }
