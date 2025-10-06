@@ -6,9 +6,9 @@ namespace App\Domains\Category\Service;
 
 use Exception;
 
-use App\Domains\Category\Enum\CategoryEnum;
-use App\Domains\Category\Interface\CategoryInterface;
 use App\Domains\Category\Repository\CategoryRepository;
+use App\Domains\Category\Interface\CategoryInterface;
+use App\Domains\Category\Enum\CategoryEnum;
 
 final class CategoryService
 {
