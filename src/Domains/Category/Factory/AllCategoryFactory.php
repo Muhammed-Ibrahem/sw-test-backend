@@ -10,8 +10,8 @@ use App\Domains\Category\Entity\AllCategory;
 
 class AllCategoryFactory extends CategoryFactory
 {
-    public function createCategory(int $id): CategoryInterface
-    {
-        return new AllCategory($id);
-    }
+    // public function createCategory(int $id): CategoryInterface
+    // {
+    //     return new AllCategory($id);
+    // }
 }

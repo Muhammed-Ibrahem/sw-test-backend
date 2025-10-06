@@ -6,7 +6,7 @@ namespace App\Domains\Category\Entity;
 
 use App\Domains\Category\Interface\CategoryInterface;
 
-abstract class Category implements CategoryInterface
+class Category implements CategoryInterface
 {
     protected int $id;
     protected string $name;

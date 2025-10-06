@@ -8,7 +8,7 @@ use Exception;
 
 use App\Domains\Category\Repository\CategoryRepository;
 use App\Domains\Category\Interface\CategoryInterface;
-use App\Domains\Category\Enum\CategoryEnum;
+use App\Domains\Category\Factory\CategoryFactory;
 
 final class CategoryService
 {
@@ -57,7 +57,7 @@ final class CategoryService
         $categoryName = $row['name'];
         $categoryId = $row['id'];
 
-        return CategoryEnum::from($categoryName)->getFactory()->createCategory($categoryId);
+        return CategoryFactory::createCategory($categoryId, $categoryName);
     }
     private function createCategoriesFromDBRows(array $rows): array
     {

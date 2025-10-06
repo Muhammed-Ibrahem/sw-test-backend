@@ -10,8 +10,8 @@ use App\Domains\Category\Entity\ClothesCategory;
 
 final class ClothesFactory extends CategoryFactory
 {
-    public function createCategory(int $id): CategoryInterface
-    {
-        return new ClothesCategory($id);
-    }
+    // public function createCategory(int $id): CategoryInterface
+    // {
+    //     return new ClothesCategory($id);
+    // }
 }

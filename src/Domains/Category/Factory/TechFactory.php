@@ -10,8 +10,8 @@ use App\Domains\Category\Entity\TechCategory;
 
 final class TechFactory extends CategoryFactory
 {
-    public function createCategory(int $id): CategoryInterface
-    {
-        return new TechCategory($id);
-    }
+    // public function createCategory(int $id): CategoryInterface
+    // {
+    //     return new TechCategory($id);
+    // }
 }
