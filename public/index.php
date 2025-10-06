@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Dotenv\Dotenv;
+// use Dotenv\Dotenv;
 
 use App\App;
 use App\Config\Config;
@@ -18,8 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-$dotenv = Dotenv::createImmutable(dirname(__DIR__));
-$dotenv->load();
+// $dotenv = Dotenv::createImmutable(dirname(__DIR__));
+// $dotenv->load();
 
 
 
