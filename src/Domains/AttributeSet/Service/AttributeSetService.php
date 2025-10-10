@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Domains\AttributeSet\Service;
 
-use Exception;
-
 use App\Domains\AttributeSet\Repository\AttributeSetRepository;
 use App\Domains\AttributeSet\Enum\AttributeSetEnum;
 
@@ -17,22 +15,18 @@ class AttributeSetService
 
     public function getAttributeSetByProductIds(array $productIds)
     {
-        try {
-            $rows = $this->repo->findByProductIds($productIds);
+        $rows = $this->repo->findByProductIds($productIds);
 
-            $sets = $this->createAttributeSetGroupedByProductId($rows);
+        $sets = $this->createAttributeSetGroupedByProductId($rows);
 
 
-            foreach ($productIds as $id) {
-                if (! isset($sets[$id])) {
-                    $sets[$id] = [];
-                }
+        foreach ($productIds as $id) {
+            if (! isset($sets[$id])) {
+                $sets[$id] = [];
             }
-
-            return $sets;
-        } catch (Exception $e) {
-            throw new Exception("Failed to retrieve AttributeSets: {$e->getMessage()}");
         }
+
+        return $sets;
     }
 
     private function createAttributeSetFromDBRow(array $row)
