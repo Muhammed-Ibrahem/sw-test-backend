@@ -12,7 +12,6 @@ use GraphQL\Error\Error;
 use GraphQL\Error\DebugFlag;
 
 use App\Core\Container\Container;
-use App\Core\Logger\Logger;
 use App\GraphQL\GraphQLSchema;
 
 final class GraphQLController
