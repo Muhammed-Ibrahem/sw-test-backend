@@ -8,9 +8,11 @@ use Throwable;
 use RuntimeException;
 
 use GraphQL\GraphQL as GraphQLBase;
+use GraphQL\Error\Error;
 use GraphQL\Error\DebugFlag;
 
 use App\Core\Container\Container;
+use App\Core\Logger\Logger;
 use App\GraphQL\GraphQLSchema;
 
 final class GraphQLController
@@ -38,17 +40,50 @@ final class GraphQLController
                 variableValues: $variableValues
             );
 
-            $output = $result->toArray(DebugFlag::INCLUDE_TRACE);
+            $result->setErrorFormatter([self::class, 'formatGraphQLError']);
+
+            $output = $result->toArray(DebugFlag::NONE);
         } catch (Throwable $e) {
             $output = [
-                "error" => [
-                    "message" => $e->getMessage(),
-                    "trace" => $e->getTraceAsString(),
+                "errors" => [
+                    "trace" => $e->getMessage(),
+                    "message" => "Internal Server Error",
+                    'extensions' => [
+                        'code' => 'SERVER_ERROR',
+                        'status' => 500,
+                        'timestamp' => date(DATE_ATOM)
+                    ]
                 ]
             ];
         }
 
         header('Content-Type: application/json; charset=UTF-8');
         return json_encode($output);
+    }
+
+    public static function formatGraphQLError(Error $error): array
+    {
+        $prev = $error->getPrevious();
+
+        $code = match ($prev?->getCode()) {
+            400 => 'BAD_USER_INPUT',
+            401 => 'UNAUTHENTICATED',
+            403 => 'FORBIDDEN',
+            404 => 'NOT_FOUND',
+            409 => 'CONFLICT',
+            default => 'INTERNAL_SERVER_ERROR'
+        };
+
+        $status = is_int($prev?->getCode()) ? $prev->getCode() : 500;
+
+        return [
+            'message' => $prev?->getMessage() ?? $error->getMessage(),
+            'path' => $error->getPath(),
+            'extensions' => [
+                'code' => $code,
+                'status' => $status,
+                'timestamp' => date(DATE_ATOM),
+            ],
+        ];
     }
 }
