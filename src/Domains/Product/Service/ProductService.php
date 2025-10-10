@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\Product\Service;
 
-use Exception;
+use App\Exceptions\NotFoundException;
 
 use App\Domains\Product\Factory\ProductFactory;
 use App\Domains\Product\Interface\ProductInterface;
@@ -16,48 +16,40 @@ class ProductService
 
     public function getProductById(string $id): ?ProductInterface
     {
-        try {
-            $row = $this->repo->findById($id);
-            if (! $row) return null;
 
-            $product = $this->createProductFromDBRow($row);
+        $row = $this->repo->findById($id);
+        if (! $row) {
+            throw new NotFoundException("Product not found");
+        };
 
-            return $product;
-        } catch (Exception $e) {
-            throw new Exception("Failed to retrieve product: {$e->getMessage()}");
-        }
+        $product = $this->createProductFromDBRow($row);
+
+        return $product;
     }
 
     public function getAllProducts(): array
     {
-        try {
-            $rows = $this->repo->findAll();
+        $rows = $this->repo->findAll();
 
-            $products = $this->createProductsFromDBRows($rows);
+        $products = $this->createProductsFromDBRows($rows);
 
-            return $products;
-        } catch (Exception $e) {
-            throw new Exception("Failed to retrieve products: {$e->getMessage()}");
-        }
+        return $products;
     }
 
     public function getProductsByCategoryIds(array $categoryIds): array
     {
-        try {
-            $rows = $this->repo->findByCategoryIds($categoryIds);
 
-            $map = $this->createGroupedProducts($rows, 'category_id');
+        $rows = $this->repo->findByCategoryIds($categoryIds);
 
-            foreach ($categoryIds as $id) {
-                if (! isset($map[$id])) {
-                    $map[$id] = [];
-                }
+        $map = $this->createGroupedProducts($rows, 'category_id');
+
+        foreach ($categoryIds as $id) {
+            if (! isset($map[$id])) {
+                $map[$id] = [];
             }
-
-            return $map;
-        } catch (Exception $e) {
-            throw new Exception("Failed to retrieve products: {$e->getMessage()}");
         }
+
+        return $map;
     }
 
     private function createProductFromDBRow(array $row)
