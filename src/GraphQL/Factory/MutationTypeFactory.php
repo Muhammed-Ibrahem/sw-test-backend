@@ -18,14 +18,6 @@ final class MutationTypeFactory
         return new ObjectType([
             "name" => "Mutation",
             "fields" => fn() => [
-                "sum" => [
-                    "type" => Type::int(),
-                    "args" => [
-                        "x" => ["type" => Type::int()],
-                        "y" => ["type" => Type::int()],
-                    ],
-                    "resolve" => fn($calc, array $args) => $args["x"] + $args["y"]
-                ],
                 "placeOrder" => [
                     "type" => Type::nonNull(Type::int()),
                     "args" => [
