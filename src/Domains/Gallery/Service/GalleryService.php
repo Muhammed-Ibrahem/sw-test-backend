@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Domains\Gallery\Service;
 
-use Exception;
-
 use App\Domains\Gallery\Factory\GalleryFactory;
 use App\Domains\Gallery\Repository\GalleryRepository;
 use App\Domains\Gallery\Interface\GalleryInterface;
@@ -16,15 +14,11 @@ class GalleryService
 
     public function getGalleryByProductIds(array $productIds): array
     {
-        try {
-            $rows = $this->repo->findGalleryByProductIds($productIds);
+        $rows = $this->repo->findGalleryByProductIds($productIds);
 
-            $gallery = $this->createGalleryGroupedByProductId($rows);
+        $gallery = $this->createGalleryGroupedByProductId($rows);
 
-            return $gallery;
-        } catch (Exception $e) {
-            throw new Exception("Failed to retrieve gallery: {$e->getMessage()}");
-        }
+        return $gallery;
     }
 
     private function createGalleryFromDBRow(array $row): GalleryInterface

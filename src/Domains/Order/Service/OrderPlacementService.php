@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Domains\Order\Service;
 
+use App\Exceptions\AppException;
 use Exception;
 use PDO;
 
 use App\Domains\OrderItemAttribute\Repository\OrderItemAttributeRepository;
 use App\Domains\OrderItem\Repository\OrderItemRepository;
 use App\Domains\Order\Repository\OrderRepository;
+use App\Exceptions\DatabaseException;
 
 class OrderPlacementService
 {
@@ -32,18 +34,34 @@ class OrderPlacementService
             $orderId = $this->orderRepository->createOrder($totalAmount, $orderCurrencyId);
 
             foreach ($items as $item) {
-                $orderItemId = $this->orderItemRepository->createOrderItem($orderId, $item['productId'], $item["quantity"], $item['unitPrice'], $item['currencyId']);
+                $orderItemId = $this->orderItemRepository->createOrderItem(
+                    $orderId,
+                    $item['productId'],
+                    $item["quantity"],
+                    $item['unitPrice'],
+                    $item['currencyId']
+                );
+
                 $itemAttributes = $item['attributes'];
+
                 foreach ($itemAttributes as $attr) {
-                    $this->orderItemAttributeRepository->createOrderItemAttribute($orderItemId, $attr['attributeId'], $attr['attributeSetId']);
+                    $this->orderItemAttributeRepository->createOrderItemAttribute(
+                        $orderItemId,
+                        $attr['attributeId'],
+                        $attr['attributeSetId']
+                    );
                 }
             }
 
             $this->connection->commit();
 
             return $orderId;
+        } catch (DatabaseException $e) {
+            $this->connection->rollBack();
+            throw $e;
         } catch (Exception $e) {
-            throw new Exception("Faild to place an order: {$e->getMessage()}");
+            $this->connection->rollBack();
+            throw new AppException();
         }
     }
 

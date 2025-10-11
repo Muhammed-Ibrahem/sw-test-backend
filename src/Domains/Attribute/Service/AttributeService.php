@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Domains\Attribute\Service;
 
-use Exception;
-
 use App\Domains\Attribute\Repository\AttributeRepository;
 use App\Domains\Attribute\Factory\AttributeFactory;
 
@@ -17,15 +15,12 @@ class AttributeService
 
     public function getAttrByProductAndSetIds(array $productIds, array $setIds)
     {
-        try {
-            $rows = $this->repo->findByProductAndSetIds($productIds, $setIds);
 
-            $attributes = $this->createAttributeGroupedByProductAndSetId($rows);
+        $rows = $this->repo->findByProductAndSetIds($productIds, $setIds);
 
-            return $attributes;
-        } catch (Exception $e) {
-            throw new Exception("Failed to retrieve attributes: {$e->getMessage()}");
-        }
+        $attributes = $this->createAttributeGroupedByProductAndSetId($rows);
+
+        return $attributes;
     }
 
     private function createAttributeFromDBRow(array $row)

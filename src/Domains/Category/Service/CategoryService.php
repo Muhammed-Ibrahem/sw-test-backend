@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\Category\Service;
 
-use Exception;
+use App\Exceptions\NotFoundException;
 
 use App\Domains\Category\Repository\CategoryRepository;
 use App\Domains\Category\Interface\CategoryInterface;
@@ -16,41 +16,34 @@ final class CategoryService
 
     public function getAllCategories(): array
     {
-        try {
-            $rows = $this->repo->getAll();
+        $rows = $this->repo->getAll();
 
-            $categories = $this->createCategoriesFromDBRows($rows);
+        $categories = $this->createCategoriesFromDBRows($rows);
 
-            return $categories;
-        } catch (Exception $e) {
-            throw new Exception("Failed to fetch categories: {$e->getMessage()}");
-        }
+        return $categories;
     }
 
     public function getCategoriesByIds(array $categoryIds): array
     {
-        try {
-            $rows = $this->repo->findByIds($categoryIds);
 
-            $categories = $this->createCategoriesGroupedById($rows);
+        $rows = $this->repo->findByIds($categoryIds);
 
-            return $categories;
-        } catch (Exception $e) {
-            throw new Exception("Failed to retrieve categories: {$e->getMessage()}");
-        }
+        $categories = $this->createCategoriesGroupedById($rows);
+
+        return $categories;
     }
 
     public function getCategoryByName(string $categoryName)
     {
-        try {
-            $row = $this->repo->findByName($categoryName);
 
-            $category = $this->createCategoryFromDBRow($row);
+        $row = $this->repo->findByName($categoryName);
 
-            return $category;
-        } catch (Exception $e) {
-            throw new Exception("Failed to retrieve categories: {$e->getMessage()}");
+        if (!$row) {
+            throw new NotFoundException("Category Not Found");
         }
+
+        $category = $this->createCategoryFromDBRow($row);
+        return $category;
     }
     private function createCategoryFromDBRow(array $row): CategoryInterface
     {
