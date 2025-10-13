@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Config\Config;
 use App\Core\Database\Database;
+use App\Core\Logger\Logger;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -27,15 +28,15 @@ if ($data === null) {
 $config = new Config($_ENV);
 $db = new Database($config->db ?? []);
 $pdo = $db->getConnection();
-echo ("Database connected successfully." . PHP_EOL);
+Logger::log("Database connected successfully." . PHP_EOL);
 
-echo ("Starting database seeding process..." . PHP_EOL);
+Logger::log("Starting database seeding process..." . PHP_EOL);
 try {
     // Start transaction
     $pdo->beginTransaction();
 
     // 1. Seed Categories
-    echo ("Seeding categories..." . PHP_EOL);
+    Logger::log("Seeding categories..." . PHP_EOL);
     $insertCategoryStmt = $pdo->prepare(
         "INSERT INTO category (name) VALUES (:name)
          ON DUPLICATE KEY UPDATE name = name"
@@ -43,7 +44,7 @@ try {
     foreach ($data['data']['categories'] as $category) {
         $insertCategoryStmt->execute([':name' => $category['name']]);
     }
-    echo ("Categories seeded successfully!" . PHP_EOL);
+    Logger::log("Categories seeded successfully!" . PHP_EOL);
 
     // Build category map: name => id
     $categoryMap = [];
@@ -53,7 +54,7 @@ try {
     }
 
     // 2. Seed Brands
-    echo ("Seeding brands..." . PHP_EOL);
+    Logger::log("Seeding brands..." . PHP_EOL);
     // Collect brand names from products.
     $brands = [];
     foreach ($data['data']['products'] as $product) {
@@ -66,7 +67,7 @@ try {
     foreach (array_keys($brands) as $brandName) {
         $insertBrandStmt->execute([':name' => $brandName]);
     }
-    echo ("Brands seeded successfully!" . PHP_EOL);
+    Logger::log("Brands seeded successfully!" . PHP_EOL);
 
     // Build brand map: name => id
     $brandMap = [];
@@ -76,7 +77,7 @@ try {
     }
 
     // 3. Seed Currency (Assuming only USD for now)
-    echo ("Seeding currencies..." . PHP_EOL);
+    Logger::log("Seeding currencies..." . PHP_EOL);
     $insertCurrencyStmt = $pdo->prepare(
         "INSERT INTO currency (symbol, label) VALUES (:symbol, :label)
          ON DUPLICATE KEY UPDATE symbol = symbol"
@@ -86,7 +87,7 @@ try {
         ':symbol' => '$',
         ':label' => 'USD'
     ]);
-    echo ("Currencies seeded successfully!" . PHP_EOL);
+    Logger::log("Currencies seeded successfully!" . PHP_EOL);
 
     // Build currency map
     $currencyMap = [];
@@ -96,7 +97,7 @@ try {
     }
 
     // 4. Seed Products, Galleries, Prices, Attribute Sets, Attributes, and Product_Attributes
-    echo ("Preparing to seed products, galleries, prices, attributes..." . PHP_EOL);
+    Logger::log("Preparing to seed products, galleries, prices, attributes..." . PHP_EOL);
     $insertProductStmt = $pdo->prepare(
         "INSERT INTO product (id, name, in_stock, description, category_id, brand_id)
          VALUES (:id, :name, :in_stock, :description, :category_id, :brand_id)"
@@ -131,7 +132,7 @@ try {
     );
 
     foreach ($data['data']['products'] as $product) {
-        echo ("Seeding product: " . $product['name']);
+        Logger::log("Seeding product: " . $product['name']);
 
         // Map category and brand using the maps built above.
         $categoryName = $product['category'];
@@ -204,17 +205,17 @@ try {
             }
         }
 
-        echo ("Product seeded successfully: " . $product['name']);
+        Logger::log("Product seeded successfully: " . $product['name']);
     }
 
     // Commit transaction
     $pdo->commit();
 
-    echo ("Seeding process completed!" . PHP_EOL);
+    Logger::log("Seeding process completed!" . PHP_EOL);
 } catch (Exception $e) {
     $pdo->rollBack();
-    echo "Error seeding data: " . $e->getMessage() . "\n";
+    Logger::log("Error seeding data: " . $e->getMessage() . PHP_EOL);
 } finally {
     $db->disconnect();
-    echo ("Database connection closed." . PHP_EOL);
+    Logger::log("Database connection closed." . PHP_EOL);
 }
