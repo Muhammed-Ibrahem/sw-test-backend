@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use App\Core\Logger\LoggerLevelsEnum;
 use Dotenv\Dotenv;
 
 use App\App;
@@ -46,7 +47,7 @@ $request = [
     'uri' => $_SERVER['REQUEST_URI']
 ];
 
-Logger::log("{$request['method']} {$request['uri']}");
+Logger::log("{$request['method']} {$request['uri']}", LoggerLevelsEnum::INFO);
 
 $container = new Container();
 

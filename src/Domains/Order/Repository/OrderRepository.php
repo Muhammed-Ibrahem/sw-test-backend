@@ -6,6 +6,9 @@ namespace App\Domains\Order\Repository;
 
 use PDOException;
 
+use App\Core\Logger\LoggerLevelsEnum;
+use App\Core\Logger\Logger;
+
 use App\Core\Repository\BaseRepository;
 use App\Exceptions\DatabaseException;
 
@@ -25,6 +28,8 @@ class OrderRepository extends BaseRepository
 
             return (int) $this->connection->lastInsertId();
         } catch (PDOException $e) {
+            Logger::log("Failed to INSERT an order: {$e->getMessage()}", LoggerLevelsEnum::ERROR);
+
             throw new DatabaseException("Failed to place an order, please try again");
         }
     }

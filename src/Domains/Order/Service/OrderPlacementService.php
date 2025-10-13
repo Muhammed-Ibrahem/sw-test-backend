@@ -7,6 +7,9 @@ namespace App\Domains\Order\Service;
 use Exception;
 use PDO;
 
+use App\Core\Logger\LoggerLevelsEnum;
+use App\Core\Logger\Logger;
+
 use App\Exceptions\DatabaseException;
 use App\Exceptions\AppException;
 
@@ -60,12 +63,19 @@ class OrderPlacementService
 
             $this->connection->commit();
 
+            Logger::log("A new order was placed with an ID of #{$orderId}", LoggerLevelsEnum::INFO);
             return $orderId;
         } catch (DatabaseException $e) {
+            Logger::log("Order Transaction failed: {$e->getMessage()}", LoggerLevelsEnum::ERROR);
+
             $this->connection->rollBack();
+
             throw $e;
         } catch (Exception $e) {
+            Logger::log("Order Transaction failed: {$e->getMessage()}", LoggerLevelsEnum::ERROR);
+
             $this->connection->rollBack();
+
             throw new AppException();
         }
     }
