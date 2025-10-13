@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace App\Domains\Order\Service;
 
-use App\Exceptions\AppException;
 use Exception;
 use PDO;
+
+use App\Exceptions\DatabaseException;
+use App\Exceptions\AppException;
+
+use App\Domains\OrderItem\DTO\OrderItemDTO;
+use App\Domains\Order\DTO\OrderDTO;
 
 use App\Domains\OrderItemAttribute\Repository\OrderItemAttributeRepository;
 use App\Domains\OrderItem\Repository\OrderItemRepository;
 use App\Domains\Order\Repository\OrderRepository;
-use App\Exceptions\DatabaseException;
 
 class OrderPlacementService
 {
@@ -23,9 +27,10 @@ class OrderPlacementService
     ) {}
 
 
-    public function placeOrder(array $items): int
+    public function placeOrder(OrderDTO $order): int
     {
-        $orderCurrencyId = $items[0]['currencyId'];
+        $items = $order->getOrderItems();
+        $orderCurrencyId = $items[0]->getCurrencyId();
         $totalAmount = $this->calculateTotalPrice($items);
 
         try {
@@ -36,19 +41,19 @@ class OrderPlacementService
             foreach ($items as $item) {
                 $orderItemId = $this->orderItemRepository->createOrderItem(
                     $orderId,
-                    $item['productId'],
-                    $item["quantity"],
-                    $item['unitPrice'],
-                    $item['currencyId']
+                    $item->getProductId(),
+                    $item->getQuantity(),
+                    $item->getUnitPrice(),
+                    $item->getCurrencyId()
                 );
 
-                $itemAttributes = $item['attributes'];
+                $itemAttributes = $item->getAttributes();
 
                 foreach ($itemAttributes as $attr) {
                     $this->orderItemAttributeRepository->createOrderItemAttribute(
                         $orderItemId,
-                        $attr['attributeId'],
-                        $attr['attributeSetId']
+                        $attr->getAttributeId(),
+                        $attr->getAttributeSetId()
                     );
                 }
             }
@@ -65,12 +70,13 @@ class OrderPlacementService
         }
     }
 
+    /** @param OrderItemDTO[] $items */
     private function calculateTotalPrice(array $items): float
     {
         $total = 0.00;
 
         foreach ($items as $item) {
-            $total += $item['unitPrice'] * $item["quantity"];
+            $total += $item->getUnitPrice() * $item->getQuantity();
         }
 
         return $total;
