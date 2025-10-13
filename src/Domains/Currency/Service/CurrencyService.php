@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Domains\Currency\Service;
 
-use Exception;
-
 use App\Domains\Currency\Repository\CurrencyRepository;
 use App\Domains\Currency\Interface\CurrencyInterface;
 use App\Domains\Currency\Enum\CurrencyEnum;
@@ -16,15 +14,11 @@ class CurrencyService
 
     public function findCurrencyByIds(array $ids)
     {
-        try {
-            $rows = $this->repo->findByIds($ids);
+        $rows = $this->repo->findByIds($ids);
 
-            $currencies = $this->createCurrencyGroupedById($rows);
+        $currencies = $this->createCurrencyGroupedById($rows);
 
-            return $currencies;
-        } catch (Exception $e) {
-            throw new Exception("Failed to retrieve currencies: {$e->getMessage()}");
-        }
+        return $currencies;
     }
 
     private function createCurrencyFromDBRow(array $row): CurrencyInterface

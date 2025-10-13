@@ -4,43 +4,58 @@ declare(strict_types=1);
 
 namespace App\Domains\Product\Repository;
 
+use PDOException;
+
 use App\Core\Repository\BaseRepository;
+use App\Exceptions\DatabaseException;
 
 class ProductRepository extends BaseRepository
 {
     public function findById(string $id)
     {
-        $query = "SELECT * FROM product WHERE id = :id LIMIT 1";
+        try {
+            $query = "SELECT * FROM product WHERE id = :id LIMIT 1";
 
-        $stmt = $this->connection->prepare($query);
+            $stmt = $this->connection->prepare($query);
 
-        $stmt->execute(["id" => $id]);
+            $stmt->execute(["id" => $id]);
 
-        return $stmt->fetch();
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            throw new DatabaseException();
+        }
     }
 
     public function findByCategoryIds(array $ids): array
     {
 
-        $placeholder = join(",", array_pad([], count($ids), "?"));
+        try {
+            $placeholder = join(",", array_pad([], count($ids), "?"));
 
-        $query = "SELECT * FROM product WHERE category_id IN ({$placeholder})";
+            $query = "SELECT * FROM product WHERE category_id IN ({$placeholder})";
 
-        $stmt = $this->connection->prepare($query);
+            $stmt = $this->connection->prepare($query);
 
-        $stmt->execute($ids);
+            $stmt->execute($ids);
 
-        return $stmt->fetchAll();
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            throw new DatabaseException();
+        }
     }
 
     public function findAll(): array
     {
-        $query = "SELECT * FROM product";
+        try {
+            $query = "SELECT * FROM product";
 
-        $stmt = $this->connection->prepare($query);
+            $stmt = $this->connection->prepare($query);
 
-        $stmt->execute();
+            $stmt->execute();
 
-        return $stmt->fetchAll();
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            throw new DatabaseException();
+        }
     }
 }
