@@ -2,10 +2,12 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use App\App;
-use App\Config\Config;
-use App\Core\Container\Container;
+use App\Core\Logger\LoggerLevelsEnum;
 use App\Core\Logger\Logger;
+
+use App\Core\Container\Container;
+use App\Config\Config;
+use App\App;
 
 $allowedOrigins = explode(',', $_ENV['ALLOWED_ORIGINS']);
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -38,7 +40,7 @@ $request = [
     'uri' => $_SERVER['REQUEST_URI']
 ];
 
-Logger::log("{$request['method']} {$request['uri']}");
+Logger::log("{$request['method']} {$request['uri']}", LoggerLevelsEnum::INFO);
 
 $container = new Container();
 

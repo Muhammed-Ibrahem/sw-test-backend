@@ -6,6 +6,9 @@ namespace App\Domains\OrderItemAttribute\Repository;
 
 use PDOException;
 
+use App\Core\Logger\LoggerLevelsEnum;
+use App\Core\Logger\Logger;
+
 use App\Core\Repository\BaseRepository;
 use App\Exceptions\DatabaseException;
 
@@ -29,6 +32,8 @@ class OrderItemAttributeRepository extends BaseRepository
                 "attributeSetId" => $attributeSetId
             ]);
         } catch (PDOException $e) {
+            Logger::log("Failed to INSERT OrderItemAttributes: {$e->getMessage()}", LoggerLevelsEnum::ERROR);
+
             throw new DatabaseException();
         }
     }

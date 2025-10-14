@@ -6,6 +6,9 @@ namespace App\Domains\AttributeSet\Repository;
 
 use PDOException;
 
+use App\Core\Logger\LoggerLevelsEnum;
+use App\Core\Logger\Logger;
+
 use App\Core\Repository\BaseRepository;
 use App\Exceptions\DatabaseException;
 
@@ -28,6 +31,8 @@ class AttributeSetRepository extends BaseRepository
 
             return $stmt->fetchAll();
         } catch (PDOException $e) {
+            Logger::log("Failed to retrieve Attribute Sets: {$e->getMessage()}", LoggerLevelsEnum::ERROR);
+
             throw new DatabaseException();
         }
     }

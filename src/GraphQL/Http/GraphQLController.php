@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Http;
 
-use Throwable;
 use RuntimeException;
+use Throwable;
 
 use GraphQL\GraphQL as GraphQLBase;
-use GraphQL\Error\Error;
 use GraphQL\Error\DebugFlag;
+use GraphQL\Error\Error;
+
+use App\Core\Logger\LoggerLevelsEnum;
+use App\Core\Logger\Logger;
 
 use App\Core\Container\Container;
 use App\GraphQL\GraphQLSchema;
@@ -43,6 +46,8 @@ final class GraphQLController
 
             $output = $result->toArray(DebugFlag::NONE);
         } catch (Throwable $e) {
+            Logger::log("GraphQL Controller Failure: {$e->getMessage()}", LoggerLevelsEnum::CRITICAL);
+
             $output = [
                 "errors" => [
                     "trace" => $e->getMessage(),

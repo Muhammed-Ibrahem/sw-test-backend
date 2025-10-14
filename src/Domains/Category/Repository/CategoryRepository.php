@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Domains\Category\Repository;
 
+use PDOException;
+
+use App\Core\Logger\LoggerLevelsEnum;
+use App\Core\Logger\Logger;
+
 use App\Core\Repository\BaseRepository;
 use App\Exceptions\DatabaseException;
 
-use PDOException;
 
 final class CategoryRepository extends BaseRepository
 {
@@ -22,6 +26,8 @@ final class CategoryRepository extends BaseRepository
 
             return $stmt->fetchAll();
         } catch (PDOException $e) {
+            Logger::log("Failed to retrieve category: {$e->getMessage()}", LoggerLevelsEnum::ERROR);
+
             throw new DatabaseException();
         }
     }
@@ -33,6 +39,7 @@ final class CategoryRepository extends BaseRepository
 
             $placeholder = join(",", \array_pad([], \count($categoryIds), "?"));
 
+
             $query = "SELECT * FROM category WHERE id IN ({$placeholder})";
 
             $stmt = $this->connection->prepare($query);
@@ -41,6 +48,8 @@ final class CategoryRepository extends BaseRepository
 
             return $stmt->fetchAll();
         } catch (PDOException $e) {
+            Logger::log("Failed to retrieve categories: {$e->getMessage()}", LoggerLevelsEnum::ERROR);
+
             throw new DatabaseException();
         }
     }
@@ -56,6 +65,8 @@ final class CategoryRepository extends BaseRepository
 
             return $stmt->fetch();
         } catch (PDOException $e) {
+            Logger::log("Failed to category categories: {$e->getMessage()}", LoggerLevelsEnum::ERROR);
+
             throw new DatabaseException();
         }
     }

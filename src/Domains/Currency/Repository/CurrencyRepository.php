@@ -6,6 +6,9 @@ namespace App\Domains\Currency\Repository;
 
 use PDOException;
 
+use App\Core\Logger\LoggerLevelsEnum;
+use App\Core\Logger\Logger;
+
 use App\Core\Repository\BaseRepository;
 use App\Exceptions\DatabaseException;
 
@@ -24,6 +27,8 @@ class CurrencyRepository extends BaseRepository
 
             return $stmt->fetchAll();
         } catch (PDOException $e) {
+            Logger::log("Failed to retrieve Currency: {$e->getMessage()}", LoggerLevelsEnum::ERROR);
+
             throw new DatabaseException();
         }
     }

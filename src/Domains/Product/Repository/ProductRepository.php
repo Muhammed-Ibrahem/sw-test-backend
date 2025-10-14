@@ -6,6 +6,9 @@ namespace App\Domains\Product\Repository;
 
 use PDOException;
 
+use App\Core\Logger\LoggerLevelsEnum;
+use App\Core\Logger\Logger;
+
 use App\Core\Repository\BaseRepository;
 use App\Exceptions\DatabaseException;
 
@@ -22,6 +25,8 @@ class ProductRepository extends BaseRepository
 
             return $stmt->fetch();
         } catch (PDOException $e) {
+            Logger::log("Failed to retrieve Product: {$e->getMessage()}", LoggerLevelsEnum::ERROR);
+
             throw new DatabaseException();
         }
     }
@@ -40,6 +45,8 @@ class ProductRepository extends BaseRepository
 
             return $stmt->fetchAll();
         } catch (PDOException $e) {
+            Logger::log("Failed to retrieve Products: {$e->getMessage()}", LoggerLevelsEnum::ERROR);
+
             throw new DatabaseException();
         }
     }
@@ -55,6 +62,8 @@ class ProductRepository extends BaseRepository
 
             return $stmt->fetchAll();
         } catch (PDOException $e) {
+            Logger::log("Failed to retrieve Products: {$e->getMessage()}", LoggerLevelsEnum::ERROR);
+
             throw new DatabaseException();
         }
     }
